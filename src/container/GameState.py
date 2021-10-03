@@ -93,7 +93,7 @@ class ServerGameState:
     def refresh(self):
         """Deallocates servers that are no longer running
         otherwise do nothing
-        """, 
+        """
         for server in self.servers:
             if server.is_allocated:
                 if not check_pid(server.pid):

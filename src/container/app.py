@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, jsonify
 
-from container.GameState import ServerGameState
+from GameState import ServerGameState
 from settings_file_utils import (
     convert_to_toml,
     number_of_files,
@@ -23,9 +23,7 @@ PORT_MAPPINGS = [
 
 app = Flask(__name__)
 
-
-
-server_state = ServerGameState()
+server_state = ServerGameState(PORT_MAPPINGS)
 
 @app.route('/', methods=['POST'])
 def create_server():
@@ -52,7 +50,6 @@ def create_server():
     )
     write_settings_file(game_id, convert_to_toml(settings))
     return jsonify({'game_id': game_id})
-
 
 
 @app.route('/', methods=['GET'])
@@ -91,4 +88,3 @@ def stop_server(game_id):
         'status': 'success',
         'game_id': game_id
     })
-    

@@ -52,3 +52,5 @@ def set_ports(user_settings: FullSettings, rcon_port: int, server_port: int) -> 
     user_settings['Rcon']['RconPort'] = rcon_port
     user_settings['Server']['Port'] = server_port
     return user_settings
+
+

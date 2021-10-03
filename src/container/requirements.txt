@@ -21,4 +21,4 @@ websocket-client==1.2.1
 Werkzeug==2.0.1
 WTForms==2.3.3
 zipp==3.5.0
-pydantic=1.8.2
+pydantic==1.8.2
