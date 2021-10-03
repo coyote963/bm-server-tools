@@ -1,4 +1,4 @@
-FROM debian  
+FROM dorowu/ubuntu-desktop-lxde-vnc:focal  
 RUN apt-get update && DEBIAN_FRONTENT=noninteractive apt-get install -y unzip libopenal1 libxrandr2 libglu1-mesa xvfb libcurl4 wget python3-pip tini
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
