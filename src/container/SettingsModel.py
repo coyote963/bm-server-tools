@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Dict, Optional
 
+
 class _ServerWeapBans(BaseModel):
     BanHadoken2="0"
     BanHadoken1="0"
@@ -228,6 +229,7 @@ class _ServerWeapBans(BaseModel):
     BanFists1="0"
     BanFists0="0"
 
+
 class _ServerMutators(BaseModel):
     Windy="0"
     CaptPrev="1"
@@ -386,6 +388,7 @@ class _ServerMutators(BaseModel):
     ScoreLimit="15"
     TimeLimit="0"
 
+
 class _Server(BaseModel):
     BotTeam="0"
     Bots="0"
@@ -417,16 +420,19 @@ class _Server(BaseModel):
     DedicatedFPS="30"
     Dedicated="0"
 
+
 class _Rcon(BaseModel):
     RconPassword="admin"
     RconPort="42070"
     RconEnabled="0"
+
 
 class FullSettings(BaseModel):
     ServerWeapBans: Optional[_ServerWeapBans]
     ServerMutators: Optional[_ServerMutators]
     Server: Optional[_Server]
     Rcon: Optional[_Rcon]
+
 
 def initialize_settings(settings : FullSettings) -> FullSettings:
     return FullSettings(
