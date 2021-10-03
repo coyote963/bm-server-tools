@@ -41,7 +41,7 @@ class GameState:
             'game_id': self.game_id,
             'game_port': self.game_port,
             'rcon_port': self.rcon_port,
-            'pid': self.pid if self.is_allocated else "None"
+            'pid': self.pid if self.is_allocated else None 
         }
 
 class ServerGameState:
