@@ -10,4 +10,4 @@ RUN chmod +x run.sh
 # HEALTHCHECK --start-period=5m --retries=1 --interval=1m\
 #   CMD python3 healthcheck.py || kill 1
 ENTRYPOINT ["tini", "--"]
-CMD ["/bin/bash", "run.sh"]
+CMD ["/usr/bin/bash", "run.sh"]

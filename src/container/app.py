@@ -7,6 +7,7 @@ from settings_file_utils import (
     write_settings_file,
     enforce_values
 )
+from subprocess import Popen, PIPE
 
 PORT_MAPPINGS = [
     {
@@ -41,14 +42,15 @@ def create_server():
     settings = enforce_values(settings, 
         {
             'Server': {
-                'Port': free_server['game_port'] 
+                'Port': free_server.game_port 
             },
             'Rcon': {
-                'RconPort': free_server['rcon_port']
+                'RconPort': free_server.rcon_port
             }
         }
     )
     write_settings_file(game_id, convert_to_toml(settings))
+    free_server.allocate(game_id)
     return jsonify({'game_id': game_id})
 
 

@@ -1,6 +1,10 @@
 from subprocess import Popen, PIPE
 from typing import Dict, List
 import os
+import signal
+from threading import Thread
+
+from healthcheck import run_healthchecks_periodically
 
 def check_pid(pid):        
     """ Check For the existence of a unix pid. """
@@ -9,6 +13,7 @@ def check_pid(pid):
     except OSError:
         return False
     return True
+
 
 class GameState:
     """A class for managing the state for a single server"""
@@ -20,16 +25,20 @@ class GameState:
         self.pid = None
 
 
-    def allocate(self, game_id: int):
+    def allocate(self, game_id: int, healthcheck = True):
         """Allocate a new server"""
-        process = Popen(['/BoringManRewrite', f''], stdout=PIPE, stderr=PIPE)
+        process = Popen(['/root/BoringManRewrite', '-server', f'custom{game_id}'], stdout=PIPE, stderr=PIPE)
         self.pid = process.pid
         self.is_allocated = True
         self.game_id = game_id
+        if healthcheck:
+            t = Thread(thread=run_healthchecks_periodically, args=(self,), daemon=True)
+            t.start()
 
 
     def deallocate(self):
         """Deallocate a server"""
+        os.kill(self.pid, signal.SIGTERM)
         self.is_allocated = False
         self.pid = None
         self.game_id = None
@@ -43,6 +52,7 @@ class GameState:
             'rcon_port': self.rcon_port,
             'pid': self.pid if self.is_allocated else None 
         }
+    
 
 class ServerGameState:
     """A class for managing the state of all the servers and allocating and deallocating servers"""

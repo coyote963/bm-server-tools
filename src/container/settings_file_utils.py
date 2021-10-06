@@ -6,7 +6,7 @@ from mergedeep import merge
 
 from SettingsModel import FullSettings, initialize_settings
 
-SETTINGS_FILE_DIR = '/root/.config/'
+SETTINGS_FILE_DIR = '/root/.config/BoringManRewrite/'
 
 ENFORCED_VALUES = {
     'Rcon' : {
@@ -27,7 +27,7 @@ ENFORCED_VALUES = {
 
 
 def convert_to_toml(registration_form: Dict):
-    return toml.dumps(initialize_settings(registration_form))
+    return toml.dumps(initialize_settings(registration_form).dict())
 
 
 def number_of_files():
@@ -44,7 +44,7 @@ def write_settings_file(game_id: int, file_contents: str):
 def enforce_values(user_settings: FullSettings, enforced_settings = ENFORCED_VALUES) -> FullSettings:
     """Enforces the values in the registration form to the settings"""
     user_settings = initialize_settings(user_settings)
-    return merge(user_settings, enforced_settings)
+    return merge(user_settings.dict(), enforced_settings)
 
 
 def set_ports(user_settings: FullSettings, rcon_port: int, server_port: int) -> FullSettings:
