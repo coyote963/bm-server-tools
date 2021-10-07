@@ -436,7 +436,7 @@ class FullSettings(BaseModel):
 
 def initialize_settings(settings : FullSettings) -> FullSettings:
     return FullSettings(
-        Rcon = _ServerWeapBans(**settings.get('Rcon', {})),
+        Rcon = _Rcon(**settings.get('Rcon', {})),
         ServerWeapBans = _ServerWeapBans(**settings.get('ServerWeapBans', {})),
         ServerMutators = _ServerMutators(**settings.get('ServerMutators', {})),
         Server = _Server(**settings.get('Server', {})),

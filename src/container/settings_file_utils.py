@@ -27,7 +27,7 @@ ENFORCED_VALUES = {
 
 
 def convert_to_toml(registration_form: Dict):
-    return toml.dumps(initialize_settings(registration_form).dict())
+    return toml.dumps(registration_form)
 
 
 def number_of_files():

@@ -3,8 +3,9 @@ from typing import Dict, List
 import os
 import signal
 from threading import Thread
+import time
 
-from healthcheck import run_healthchecks_periodically
+from healthcheck import health_check
 
 def check_pid(pid):        
     """ Check For the existence of a unix pid. """
@@ -27,12 +28,12 @@ class GameState:
 
     def allocate(self, game_id: int, healthcheck = True):
         """Allocate a new server"""
-        process = Popen(['/root/BoringManRewrite', '-server', f'custom{game_id}'], stdout=PIPE, stderr=PIPE)
+        process = Popen(f'/root/BoringManRewrite -server custom{game_id}', stdout=PIPE, stderr=PIPE, shell=True)
         self.pid = process.pid
         self.is_allocated = True
         self.game_id = game_id
         if healthcheck:
-            t = Thread(thread=run_healthchecks_periodically, args=(self,), daemon=True)
+            t = Thread(target=run_healthchecks_periodically, args=(self,), daemon=True)
             t.start()
 
 
@@ -108,3 +109,27 @@ class ServerGameState:
             if server.is_allocated:
                 if not check_pid(server.pid):
                     server.deallocate()
+
+
+
+def run_healthchecks_periodically(
+    gamestate: GameState,
+    retries=3,
+    delay=60,
+    initial_delay=120
+):
+    """Run the healthcheck function 
+    until it fails {retries} number of times in a row.
+    delay determines the length of time between healthchecks
+    initial_delay time is waited before beginning health checks
+    """
+    time.sleep(initial_delay)
+    failure_counter = 0
+    while failure_counter != retries:
+        if not health_check(gamestate.game_id):
+            failure_counter += 1
+        else:
+            failure_counter = 0
+        time.sleep(delay)
+    gamestate.deallocate()
+    

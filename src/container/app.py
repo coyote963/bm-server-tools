@@ -32,7 +32,6 @@ def create_server():
     Creates a Boring Man server with the settings provided in the POST form.
     Returns error if there isn't a server slot available
     """
-    server_state.refresh()
     game_id = number_of_files()
     free_server = server_state.find_free_server()
     settings = enforce_values(request.form.to_dict())
@@ -42,10 +41,11 @@ def create_server():
     settings = enforce_values(settings, 
         {
             'Server': {
-                'Port': free_server.game_port 
+                'Port': str(free_server.game_port),
+                'Name': 'haha server'
             },
             'Rcon': {
-                'RconPort': free_server.rcon_port
+                'RconPort': str(free_server.rcon_port),
             }
         }
     )
@@ -59,10 +59,14 @@ def get_server_list():
     """
     Returns a list of all the servers that have been created
     """
-    server_state.refresh()
     return jsonify({
         'servers': server_state.get_server_list()
     })
+
+# @app.route('/environ', methods=['GET'])
+# def get_environs():
+#     import os
+#     return jsonify(dict(os.environ))
 
 @app.route('/<game_id>', methods=['GET'])
 def get_server_info(game_id):

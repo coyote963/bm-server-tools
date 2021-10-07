@@ -7,9 +7,6 @@ import json
 import time
 from enum import Enum
 from queue import Queue
-import threading
-
-from GameState import GameState
 
 SERVER_SETTINGS_FILE = '/root/.config/BoringManRewrite/custom{}.ini'
 
@@ -114,30 +111,7 @@ def health_check(game_id: int):
     s.close()
     packets = connect_to_queue(s, packet_list)
     curr_usage = current_server_usage(packets)
-    if curr_usage < 0 | | curr_usage - get_number_of_bots(game_id) > 0:
+    if curr_usage < 0 or (curr_usage - get_number_of_bots(game_id) > 0):
         return True
     else:
         return False
-
-
-def run_healthchecks_periodically(
-    gamestate: GameState,
-    retries=3,
-    delay=60,
-    initial_delay=120
-):
-    """Run the healthcheck function 
-    until it fails {retries} number of times in a row.
-    delay determines the length of time between healthchecks
-    initial_delay time is waited before beginning health checks
-    """
-    time.sleep(initial_delay)
-    failure_counter = 0
-    while failure_counter != retries:
-        if not health_check(gamestate.game_id):
-            failure_counter += 1
-        else:
-            failure_counter = 0
-        time.sleep(delay)
-    gamestate.deallocate()
-    
