@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   game:
+    image: coyotebm/bm-server-api
     build: .
     ports:
       - "6080:80"

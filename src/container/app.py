@@ -63,10 +63,6 @@ def get_server_list():
         'servers': server_state.get_server_list()
     })
 
-# @app.route('/environ', methods=['GET'])
-# def get_environs():
-#     import os
-#     return jsonify(dict(os.environ))
 
 @app.route('/<game_id>', methods=['GET'])
 def get_server_info(game_id):
@@ -77,6 +73,7 @@ def get_server_info(game_id):
     return jsonify({
         'server': server_state.get_game_info(game_id)
     })
+
 
 @app.route('/<game_id>', methods=['DELETE'])
 def stop_server(game_id):

@@ -114,9 +114,9 @@ class ServerGameState:
 
 def run_healthchecks_periodically(
     gamestate: GameState,
-    retries=3,
-    delay=60,
-    initial_delay=120
+    retries=1,
+    delay=12,
+    initial_delay=12
 ):
     """Run the healthcheck function 
     until it fails {retries} number of times in a row.

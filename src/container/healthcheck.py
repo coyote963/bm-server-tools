@@ -1,4 +1,3 @@
-import configparser
 import socket
 import struct
 import sys
@@ -7,6 +6,8 @@ import json
 import time
 from enum import Enum
 from queue import Queue
+
+import toml
 
 SERVER_SETTINGS_FILE = '/root/.config/BoringManRewrite/custom{}.ini'
 
@@ -31,7 +32,8 @@ def strip_first_last(string):
     return string[1:-1]
 
 
-def connect_to_queue(sock, packet_list, needed_packets=5):
+def connect_to_queue(sock, packet_list = [], needed_packets=5):
+    """Takes the sock and gets the first 5 packets and returns it"""
     buffer = b''
     while len(packet_list) < needed_packets:
         buffer += sock.recv(1024)
@@ -55,6 +57,7 @@ def connect_to_queue(sock, packet_list, needed_packets=5):
 
 
 def send_packet(sock, packetData, packetEnum):
+    """Send the packet to the server"""
     packet_message = packetData+"\00"
     packet_size = len(bytes(packet_message, 'utf-8'))
     s = struct.Struct('h'+str(packet_size)+'s')
@@ -63,11 +66,13 @@ def send_packet(sock, packetData, packetEnum):
 
 
 def send_request(sock, requestID, packetData, packetEnum):
+    """Send request to the server"""
     packet_message = '"' + requestID + '" "' + packetData + '"'
     send_packet(sock, packet_message, packetEnum)
 
 
 def login(port, password):
+    """Logs into the server with the matching port"""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(('127.0.0.1', port))
     send_packet(s, password, 0)
@@ -75,18 +80,22 @@ def login(port, password):
 
 
 def get_rcon_credentials(game_id: int):
-    config = configparser.ConfigParser()
-    config.read(SERVER_SETTINGS_FILE.format(game_id))
-    port = int(strip_first_last(config['Rcon']['rconport']))
-    password = strip_first_last(config['Rcon']['rconpassword'])
+    config = get_settings(game_id)
+    port = int(strip_first_last(config['Rcon']['RconPort']))
+    password = strip_first_last(config['Rcon']['RconPassword'])
     return (port, password)
 
 
 def get_number_of_bots(game_id: int):
     """Returns the number of bots in the server"""
-    config = configparser.ConfigParser()
-    config.read(SERVER_SETTINGS_FILE.format(game_id))
+    config = get_settings(game_id)
     return int(strip_first_last(config['Server']['Bots']))
+
+
+def get_settings(game_id: int):
+    with open(SERVER_SETTINGS_FILE.format(game_id)) as f:
+        contents = f.read()
+    return toml.loads(contents.split("[ServerWeapBans]")[1])
 
 
 def current_server_usage(packet_list):
@@ -109,7 +118,8 @@ def health_check(game_id: int):
     time.sleep(2)
 
     s.close()
-    packets = connect_to_queue(s, packet_list)
+    packet_list = Queue()
+    packets = connect_to_queue(s)
     curr_usage = current_server_usage(packets)
     if curr_usage < 0 or (curr_usage - get_number_of_bots(game_id) > 0):
         return True
