@@ -1,13 +1,26 @@
-FROM dorowu/ubuntu-desktop-lxde-vnc:focal
-RUN apt-get update && DEBIAN_FRONTENT=noninteractive apt-get install -y unzip libopenal1 libxrandr2 libglu1-mesa xvfb libcurl4 wget python3-pip tini
+FROM ubuntu:18.04
+RUN apt-get update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y unzip \
+    xvfb \
+    vim \
+    wget \
+    tmux \
+    python3-pip \
+    apt-transport-https \
+    ca-certificates \ 
+    software-properties-common \
+    libopenal1 \
+    libxrandr2 \
+    libglu1-mesa \
+    libcurl4
+RUN wget https://spasmangames.com/downloads/linux/bm-linux.zip
+RUN unzip bm-linux.zip -d bm
+
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
-RUN wget https://spasmangames.com/downloads/linux/bm-linux.zip
-RUN unzip bm-linux.zip
-COPY . .
+
+COPY server /server
 EXPOSE 80/tcp 5900/tcp 6080/tcp 8000/tcp
+COPY run.sh .
 RUN chmod +x run.sh
-# HEALTHCHECK --start-period=5m --retries=1 --interval=1m\
-#   CMD python3 healthcheck.py || kill 1
-ENTRYPOINT ["tini", "--"]
-CMD ["/usr/bin/bash", "run.sh"]
+CMD ["/bin/bash"]

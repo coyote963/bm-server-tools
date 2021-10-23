@@ -44,13 +44,13 @@ def write_settings_file(game_id: int, file_contents: str):
 def enforce_values(user_settings: FullSettings, enforced_settings = ENFORCED_VALUES) -> FullSettings:
     """Enforces the values in the registration form to the settings"""
     user_settings = initialize_settings(user_settings)
-    return merge(user_settings.dict(), enforced_settings)
+    return FullSettings(**merge(user_settings.dict(), enforced_settings))
 
 
 def set_ports(user_settings: FullSettings, rcon_port: int, server_port: int) -> FullSettings:
     """Sets the rcon_port and server_port in the user_settings"""
-    user_settings['Rcon']['RconPort'] = rcon_port
-    user_settings['Server']['Port'] = server_port
+    user_settings.Rcon.RconPort = rcon_port
+    user_settings.Server.Port = server_port
     return user_settings
 
 

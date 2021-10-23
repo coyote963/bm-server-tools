@@ -4,36 +4,53 @@ import os
 import signal
 from threading import Thread
 import time
+from enum import Enum
 
+from psutil import pid_exists
+
+from SettingsModel import FullSettings
 from healthcheck import health_check
 
-def check_pid(pid):        
-    """ Check For the existence of a unix pid. """
-    try:
-        os.kill(pid, 0)
-    except OSError:
-        return False
-    return True
+
+class ServerMode(Enum):
+    normal = 1
+    healthcheck = 2
+    permanent = 3
 
 
 class GameState:
     """A class for managing the state for a single server"""
-    def __init__(self, game_port: int, rcon_port: int):
+    def __init__(self, game_port: int, rcon_port: int, display: int):
         self.game_port = game_port
         self.rcon_port = rcon_port
+        self.display = display
+        self.settings = None
         self.is_allocated = False
         self.game_id = None
         self.pid = None
 
 
-    def allocate(self, game_id: int, healthcheck = True):
+    def allocate(self, game_id: int, settings: FullSettings, mode: ServerMode):
         """Allocate a new server"""
-        process = Popen(f'/root/BoringManRewrite -server custom{game_id}', stdout=PIPE, stderr=PIPE, shell=True)
-        self.pid = process.pid
+        env = {
+            'DISPLAY' : f':{self.display}'
+        }
+        process = Popen([
+            '/bm/BoringManRewrite', 
+            '-dedicated_nogpu',
+            '-vanillaGFX',
+            '-server',
+            f'custom{game_id}'
+        ], env = env, stdout=PIPE, stderr=PIPE, shell=False)
         self.is_allocated = True
         self.game_id = game_id
-        if healthcheck:
+        self.settings = settings
+        self.pid = process.pid
+        if mode == ServerMode.healthcheck:
             t = Thread(target=run_healthchecks_periodically, args=(self,), daemon=True)
+            t.start()
+        if mode == ServerMode.permanent:
+            t = Thread(target=restart_stopped_server, args=(self,), daemon=True)
             t.start()
 
 
@@ -41,16 +58,17 @@ class GameState:
         """Deallocate a server"""
         os.kill(self.pid, signal.SIGTERM)
         self.is_allocated = False
-        self.pid = None
         self.game_id = None
-    
+        self.settings = None
+        self.pid = None
+        
 
     def get_game_info(self) -> Dict:
         """Returns a dictionary of information about the server"""
         return {
-            'game_id': self.game_id,
             'game_port': self.game_port,
             'rcon_port': self.rcon_port,
+            'game_id': self.game_id,
             'pid': self.pid if self.is_allocated else None 
         }
     
@@ -64,7 +82,8 @@ class ServerGameState:
             self.servers.append(
                 GameState(
                     mapping['game_port'],
-                    mapping['rcon_port']
+                    mapping['rcon_port'],
+                    mapping['display']
                 )
             )
     
@@ -107,16 +126,16 @@ class ServerGameState:
         """
         for server in self.servers:
             if server.is_allocated:
-                if not check_pid(server.pid):
+                if not pid_exists(server.pid):
                     server.deallocate()
 
 
 
 def run_healthchecks_periodically(
     gamestate: GameState,
-    retries=1,
+    retries=10,
     delay=12,
-    initial_delay=12
+    initial_delay=30
 ):
     """Run the healthcheck function 
     until it fails {retries} number of times in a row.
@@ -126,10 +145,17 @@ def run_healthchecks_periodically(
     time.sleep(initial_delay)
     failure_counter = 0
     while failure_counter != retries:
-        if not health_check(gamestate.game_id):
+        if not health_check(gamestate.settings):
             failure_counter += 1
         else:
             failure_counter = 0
         time.sleep(delay)
     gamestate.deallocate()
     
+
+def restart_stopped_server(gamestate: GameState, frequency = 15):
+    """If the server is no longer, running restart it"""
+    while gamestate.is_allocated:
+        if not pid_exists(gamestate.pid):
+            gamestate.allocate(gamestate.game_id, gamestate.settings, ServerMode.normal)
+        time.sleep(frequency)

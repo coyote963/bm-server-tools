@@ -6,14 +6,22 @@ import json
 import time
 from enum import Enum
 from queue import Queue
+import logging
 
 import toml
+
+from SettingsModel import FullSettings
 
 SERVER_SETTINGS_FILE = '/root/.config/BoringManRewrite/custom{}.ini'
 
 start_delimiter = b'\xe2\x94\x90'
 end_delimiter = b'\xe2\x94\x94'
 
+def configure_logging():
+    logging.basicConfig(filename='healtcheck.log', level=logging.DEBUG)
+    logging.info('Started')
+
+configure_logging()
 
 class rcon_event(Enum):
     rcon_ping = 41
@@ -21,6 +29,7 @@ class rcon_event(Enum):
 
 class rcon_receive(Enum):
     ping = 1
+    command = 2
     request_match = 5
 
 
@@ -71,31 +80,12 @@ def send_request(sock, requestID, packetData, packetEnum):
     send_packet(sock, packet_message, packetEnum)
 
 
-def login(port, password):
+def login(port: int, password: str):
     """Logs into the server with the matching port"""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('127.0.0.1', port))
+    s.connect(('localhost', port))
     send_packet(s, password, 0)
     return s
-
-
-def get_rcon_credentials(game_id: int):
-    config = get_settings(game_id)
-    port = int(strip_first_last(config['Rcon']['RconPort']))
-    password = strip_first_last(config['Rcon']['RconPassword'])
-    return (port, password)
-
-
-def get_number_of_bots(game_id: int):
-    """Returns the number of bots in the server"""
-    config = get_settings(game_id)
-    return int(strip_first_last(config['Server']['Bots']))
-
-
-def get_settings(game_id: int):
-    with open(SERVER_SETTINGS_FILE.format(game_id)) as f:
-        contents = f.read()
-    return toml.loads(contents.split("[ServerWeapBans]")[1])
 
 
 def current_server_usage(packet_list):
@@ -107,21 +97,32 @@ def current_server_usage(packet_list):
     return -1
 
 
-def health_check(game_id: int):
+
+def rawsay(socket, message):
+    send_packet(socket, 
+        'rawsay "{}" "{}"'.format(message, 65280),
+        rcon_receive.command.value
+    )
+
+def health_check(server_settings: FullSettings):
     """Returns if the server has players in it. False if the server isn't running or it is empty"""
     s = None
     try:
-        s = login(*get_rcon_credentials(game_id))
-    except socket.error:
+        s = login(int(server_settings.Rcon.RconPort), server_settings.Rcon.RconPassword)
+    except socket.error as e:
         return False
+    
     # Sleep for 2 seconds because RCON can't handle rapid fire commands
     time.sleep(2)
-
-    s.close()
-    packet_list = Queue()
+    send_request(s, "healthcheck", "1", rcon_receive.request_match.value)
+    time.sleep(2)
     packets = connect_to_queue(s)
+    logging.debug(str(packets))
+    logging.debug("Total Players: " + str(current_server_usage(packets)))
+    rawsay(s, current_server_usage(packets))
+    s.close()
     curr_usage = current_server_usage(packets)
-    if curr_usage < 0 or (curr_usage - get_number_of_bots(game_id) > 0):
+    if curr_usage < 0 or (curr_usage - int(server_settings.Server.Bots) > 0):
         return True
     else:
         return False

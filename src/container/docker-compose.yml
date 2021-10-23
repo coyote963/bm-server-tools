@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   game:
-    image: coyotebm/bm-server-api
+    image: coyotebm/bm-server-api:dev
     build: .
     ports:
       - "6080:80"
@@ -12,3 +12,4 @@ services:
       - type: bind
         source: ./files 
         target: /root/.config/BoringManRewrite
+    
