@@ -10,45 +10,14 @@ from settings_file_utils import (
     number_of_files,
     write_settings_file,
     enforce_values,
-    set_ports
+    set_ports,
+    get_port_mappings
 )
 
-PORT_MAPPINGS = [
-    {
-        'game_port': 42069,
-        'rcon_port': 42070,
-        'display': 1
-    }, {
-        'game_port': 42071,
-        'rcon_port': 42072,
-        'display': 2
-    },{
-        'game_port': 42073,
-        'rcon_port': 42074,
-        'display': 3
-    }
-]
 
 app = Flask(__name__)
 
-server_state = ServerGameState(PORT_MAPPINGS)
-
-def launch_xvfb():
-    print("Launching displays")
-    for x in PORT_MAPPINGS:
-        process = Popen([
-            'Xvfb',
-            '-screen',
-            '0',
-            '1280x800x24',
-            '-ac',
-            '-dpi',
-            '96',
-            '+extension',
-            'RANDR',
-            ':' + str(x['display']),
-        ], stdout=PIPE, stderr=PIPE, shell=False)
-
+server_state = ServerGameState(get_port_mappings())
 
 @app.route('/', methods=['POST'])
 def create_server():

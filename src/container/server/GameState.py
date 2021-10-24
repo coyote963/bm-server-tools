@@ -11,7 +11,6 @@ import psutil
 from SettingsModel import FullSettings
 from healthcheck import health_check
 
-SUBPROCESS_DIFFERENCE = 39
 
 class ServerMode(Enum):
     normal = 1
@@ -21,10 +20,9 @@ class ServerMode(Enum):
 
 class GameState:
     """A class for managing the state for a single server"""
-    def __init__(self, game_port: int, rcon_port: int, display: int):
+    def __init__(self, game_port: int, rcon_port: int):
         self.game_port = game_port
         self.rcon_port = rcon_port
-        self.display = display
         self.settings = None
         self.is_allocated = False
         self.game_id = None
@@ -35,7 +33,6 @@ class GameState:
         """Allocate a new server"""
         process = Popen([
                 'xvfb-run',
-                '--server-num=%d' % self.display,
                 '/bm/BoringManRewrite',
                 '-dedicated_nogpu',
                 '-vanillaGFX',
@@ -89,7 +86,6 @@ class ServerGameState:
                 GameState(
                     mapping['game_port'],
                     mapping['rcon_port'],
-                    mapping['display']
                 )
             )
     
