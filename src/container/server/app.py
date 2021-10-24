@@ -37,7 +37,7 @@ def launch_xvfb():
     print("Launching displays")
     for x in PORT_MAPPINGS:
         process = Popen([
-            'Xvfb,
+            'Xvfb',
             '-screen',
             '0',
             '1280x800x24',
@@ -47,10 +47,8 @@ def launch_xvfb():
             '+extension',
             'RANDR',
             ':' + str(x['display']),
-            '&',
         ], stdout=PIPE, stderr=PIPE, shell=False)
 
-launch_xvfb()
 
 @app.route('/', methods=['POST'])
 def create_server():

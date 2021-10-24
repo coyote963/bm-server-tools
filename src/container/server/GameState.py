@@ -6,11 +6,12 @@ from threading import Thread
 import time
 from enum import Enum
 
-from psutil import pid_exists
+import psutil
 
 from SettingsModel import FullSettings
 from healthcheck import health_check
 
+SUBPROCESS_DIFFERENCE = 39
 
 class ServerMode(Enum):
     normal = 1
@@ -32,31 +33,36 @@ class GameState:
 
     def allocate(self, game_id: int, settings: FullSettings, mode: ServerMode):
         """Allocate a new server"""
-        env = {
-            'DISPLAY' : f':{self.display}'
-        }
         process = Popen([
-            '/bm/BoringManRewrite', 
-            '-dedicated_nogpu',
-            '-vanillaGFX',
-            '-server',
-            f'custom{game_id}'
-        ], env = env, stdout=PIPE, stderr=PIPE, shell=False)
+                'xvfb-run',
+                '--server-num=%d' % self.display,
+                '/bm/BoringManRewrite',
+                '-dedicated_nogpu',
+                '-vanillaGFX',
+                '-server',
+                f'custom{game_id}'
+            ],
+            stdout = PIPE, 
+            stderr = PIPE, 
+        )
+        # Sleep 1 second to wait for the process to initialize
+        time.sleep(1)
         self.is_allocated = True
         self.game_id = game_id
         self.settings = settings
-        self.pid = process.pid
+        self.pid = get_server_pid(game_id)
         if mode == ServerMode.healthcheck:
             t = Thread(target=run_healthchecks_periodically, args=(self,), daemon=True)
             t.start()
         if mode == ServerMode.permanent:
             t = Thread(target=restart_stopped_server, args=(self,), daemon=True)
             t.start()
+        if mode == ServerMode.normal:
+            pass
 
 
     def deallocate(self):
         """Deallocate a server"""
-        os.kill(self.pid, signal.SIGTERM)
         self.is_allocated = False
         self.game_id = None
         self.settings = None
@@ -126,7 +132,7 @@ class ServerGameState:
         """
         for server in self.servers:
             if server.is_allocated:
-                if not pid_exists(server.pid):
+                if not psutil.pid_exists(server.pid):
                     server.deallocate()
 
 
@@ -150,12 +156,25 @@ def run_healthchecks_periodically(
         else:
             failure_counter = 0
         time.sleep(delay)
+    os.kill(gamestate.pid)
     gamestate.deallocate()
     
 
 def restart_stopped_server(gamestate: GameState, frequency = 15):
-    """If the server is no longer, running restart it"""
+    """Rerun the server if it stopped"""
     while gamestate.is_allocated:
-        if not pid_exists(gamestate.pid):
+        if not psutil.pid_exists(gamestate.pid):
             gamestate.allocate(gamestate.game_id, gamestate.settings, ServerMode.normal)
         time.sleep(frequency)
+
+
+def get_server_pid(game_id: int):
+    """Returns the PID of the server. If not found, return -1"""
+    for proc in psutil.process_iter():
+        if (
+            len(proc.cmdline()) > 0
+            and proc.cmdline()[0] == '/bm/BoringManRewrite'
+            and f'custom{game_id}' in proc.cmdline()
+        ):
+            return proc.pid
+    return -1

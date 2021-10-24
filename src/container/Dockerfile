@@ -12,7 +12,8 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y unzip \
     libopenal1 \
     libxrandr2 \
     libglu1-mesa \
-    libcurl4
+    libcurl4 \
+    htop
 RUN wget https://spasmangames.com/downloads/linux/bm-linux.zip
 RUN unzip bm-linux.zip -d bm
 
@@ -23,4 +24,4 @@ COPY server /server
 EXPOSE 80/tcp 5900/tcp 6080/tcp 8000/tcp
 COPY run.sh .
 RUN chmod +x run.sh
-CMD ["/bin/bash"]
+CMD ["/bin/bash", 'run.sh']
