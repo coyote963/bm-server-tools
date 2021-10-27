@@ -36,4 +36,7 @@ src/
 
 ## Screenshots
 
+Picture of the TUI capturing the Live Results of a match
 ![TUI screenshot](screenshots/tui.png?raw=true "Boring Man TUI")
+
+![TUI screenshot](screenshots/schema.PNG?raw=true "Boring Man TUI")
