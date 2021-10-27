@@ -24,14 +24,17 @@ Making GET requests shows every running server
 ```
 src/
     container/ - Everything that runs inside a docker container
-        app.py - Flask server
-        Dockerfile - Used for building the bm-linux docker image
-        GameState.py - Classes for organizing server state
-        healthcheck.py - Intended to be run periodically on a server to check its status
-        requirements.txt - Python dependencies
-        run.sh - Entrypoint of the Docker image
-        settings_file_utils.py - Utilities for manipulation of boring man settings files
-        SettingsModel - Pydantic models for server settings
+        server/ - Flask server files
+            GameState - Base class for storing the current state of the servers
+            SettingsModel - Class representing a Boring Man settings file
+            app.py - Entry point of the flask app
+            healthcheck.py - Tools for verifying the server is still running
+            settings_file_utils - Utilities for manipulating settings files
+        run.sh - Run the flask server locally
+        ...
+    tui/ - Standalone TUI rcon interface
+        tui.py - TUI code
+        game.py - RCOn connection
 ``` 
 
 ## Screenshots
