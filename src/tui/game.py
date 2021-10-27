@@ -50,10 +50,8 @@ def connect_to_queue(sock, packet_list: Queue):
                 js = json.loads(message_string)
                 if event_id == rcon_event.rcon_ping.value:
                     send_packet(sock, "1", rcon_receive.ping.value)
-                else:
-                    if event_id == rcon_event.player_death.value:
-                        send_packet(sock, "1", rcon_receive.request_scoreboard.value)
-                    packet_list.put(js)
+                    send_request(sock, "1", "1", rcon_receive.request_scoreboard.value)
+                packet_list.put(js)
 
 
 def send_packet(sock, packetData, packetEnum):
@@ -78,3 +76,9 @@ def login(ip: str, port: int, password: str):
     send_packet(s, password, 0)
     return s
 
+def request_match(sock):
+    send_request(sock, "1", "1", rcon_receive.request_match.value)
+
+
+def request_scoreboard(sock):
+    send_request(sock, "1", "1", rcon_receive.request_scoreboard.value)
