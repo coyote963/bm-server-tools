@@ -9,9 +9,9 @@ On distros that use apt as their package manager, run install_apt.sh, which will
 If you just want to run the docker image just run `docker run -d -p <port-range>:<port-range> -p 6080:80 -p 7778:7778 bm-linux`
 
 
-### CLI 
+### TUI 
 
-Other interfacing tools like the CLI will need the docker container running or else they won't work. To install the CLI run `install.sh` in the /src/cli folder
+The TUI is a standalone program that creates a live dashboard of a boring man server. This is useful for viewing the current status of a match on the fly. Install the requirements file and run `python tui.py` to launch it.
 
 ## Usage 
 
@@ -33,3 +33,7 @@ src/
         settings_file_utils.py - Utilities for manipulation of boring man settings files
         SettingsModel - Pydantic models for server settings
 ``` 
+
+## Screenshots
+
+![TUI screenshot](screenshots/tui.png?raw=true "Boring Man TUI")
