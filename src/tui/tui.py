@@ -19,9 +19,9 @@ from game import connect_to_queue, login, request_match, request_scoreboard
 from weapons import Weapons
 
 
-ip = Prompt.ask("Enter server IP", default="eu1.spasmangames.com")
-port = IntPrompt.ask("Enter RCON port", default=40010)
-password = Prompt.ask("Enter RCON password", default="2WegftDP")
+ip = Prompt.ask("Enter server IP", default="localhost")
+port = IntPrompt.ask("Enter RCON port", default=42070)
+password = Prompt.ask("Enter RCON password", default="admin")
 
 console = Console()
 
