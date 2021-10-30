@@ -11,5 +11,15 @@ preset_settings = {
         'ServerMutators': {
             "CaptEnable": "1",
         }
-    }
+    },
+    'dm': {
+        'Server': {
+            "Bots" : "3",
+            "Gamemode": "0",
+            "MapSelection": "1",
+            "Hazards": "0",
+            "Powerups": "1",
+            "Name": "Deathmatch"
+        }
+    },
 }
