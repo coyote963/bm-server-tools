@@ -4,9 +4,25 @@ Provides useful wrapper for bman servers. The core of everything is the boring m
 ## Installation
 ### Getting the docker image
 
-On distros that use apt as their package manager, run install_apt.sh, which will install the necessary dependencies. Build the docker image locally or just pull it from the docker hub.
+Each tool has its own requirements and are kept separate for the sake of modularity. Only the TUI does not require docker to be installed. The others can be installed by use of the `requirements.txt` file. The most up to date docker image is `coyotebm/bm-server-api:dev`.
 
-If you just want to run the docker image just run `docker run -d -p <port-range>:<port-range> -p 6080:80 -p 7778:7778 bm-linux`
+### CLI
+
+Command line tools for provisioning servers. A sample of the commands:
+
+1. `start` Starts the Boring Man Wrapper API
+2. `stop` Stops Boring Man Wrapper API and all servers running therein
+3. `add` Adds a server from a preset. Presets are configurable and defined in `presets.py`
+4. `add-custom` Adds a server from a settings file path
+5. `remove` Kills a server and frees its resources
+6. `status` Displays server information in tabular form
+
+#### Installation
+
+1. Install docker, the way to do so varies between operating systems. 
+2. Install the `requirements.txt`
+3. Ensure the current user is in the docker group
+4. `python cli.py start` to start the service
 
 
 ### TUI 
