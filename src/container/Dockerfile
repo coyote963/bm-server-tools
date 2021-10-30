@@ -20,8 +20,10 @@ RUN unzip bm-linux.zip -d bm
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
+RUN mkdir -p /root/.config/BoringManRewrite/
+
 COPY server /server
 EXPOSE 80/tcp 5900/tcp 6080/tcp 8000/tcp
 COPY run.sh .
 RUN chmod +x run.sh
-CMD ["/bin/bash", 'run.sh']
+CMD ["/bin/sh", "./run.sh"]

@@ -54,6 +54,7 @@ def set_ports(user_settings: FullSettings, rcon_port: int, server_port: int) -> 
     return user_settings
 
 def get_port_mappings() -> list:
+    """Get the game ports and rcon ports and set them to the port mapping"""
     game_ports = [int(i) for i in os.environ['GAME_PORTS'].split(',')]
     rcon_ports = [int(i) for i in os.environ['RCON_PORTS'].split(',')]
     assert len(game_ports) == len(rcon_ports)

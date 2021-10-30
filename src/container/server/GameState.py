@@ -33,6 +33,7 @@ class GameState:
         """Allocate a new server"""
         process = Popen([
                 'xvfb-run',
+                '-a',
                 '/bm/BoringManRewrite',
                 '-dedicated_nogpu',
                 '-vanillaGFX',

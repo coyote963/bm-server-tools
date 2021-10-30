@@ -14,14 +14,17 @@ from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
 from rich.prompt import Prompt, IntPrompt
+from rich.pretty import pprint, Pretty
+from rich.syntax import Syntax
+
 
 from game import connect_to_queue, login, request_match, request_scoreboard
 from weapons import Weapons
 
 
-ip = Prompt.ask("Enter server IP", default="localhost")
-port = IntPrompt.ask("Enter RCON port", default=42070)
-password = Prompt.ask("Enter RCON password", default="admin")
+ip = Prompt.ask("Enter server IP", default="eu1.spasmangames.com")
+port = IntPrompt.ask("Enter RCON port", default=40010)
+password = Prompt.ask("Enter RCON password", default="2WegftDP")
 
 console = Console()
 
@@ -69,11 +72,10 @@ def make_layout() -> Layout:
     )
     layout['body'].split_row(
         Layout(name="chatbox", ratio = 3),
-        Layout(name="killfeed", ratio = 1)
+        Layout(name="killfeed", ratio = 1),
+        Layout(name="current_packet", ratio=1)
     )
     return layout
-
-
 
 
 layout = make_layout()
@@ -229,6 +231,7 @@ with Live(layout, refresh_per_second=10, screen=True):
         layout['chatbox'].update(make_chatbox(list(chat_queue)))
         layout['killfeed'].update(make_killfeed(list(kill_queue)))
         layout['loadouts'].update(make_loadouts(list(loadout_queue)))
+        layout['current_packet'].update(Panel(Syntax(packet, "python")))
         if packet['EventID'] == '34': 
             if packet['CaseID'] == "7":
                 layout['scoreboard'].update(make_scoreboard_panel(packet))

@@ -77,7 +77,7 @@ def stop_server(game_id):
     """
     server_state.refresh()
     try:
-        server_state.stop_server(game_id)
+        server_state.stop_server(int(game_id))
     except Exception as e:
         return jsonify({
             'error': str(e)
