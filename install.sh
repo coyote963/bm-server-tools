@@ -1,29 +1,33 @@
 #!/bin/bash
 
 BASEPATH=$HOME
-CONDA_URL=https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
-install_miniconda() {
-  curl -k $CONDA_URL >${BASEPATH}/conda_install.sh
-  bash ${BASEPATH}/conda_install.sh -b -p ${BASEPATH}/miniconda3
-  rm -f ${BASEPATH}/conda_install.sh
-  $BASEPATH/miniconda3/bin/conda update -y -n base -c defaults conda
+
+install_cli() {
+  if [ ! -d ".cli_env" ]
+  then
+    echo "Installing cli dependencies"
+    python3 -m venv .cli_env
+    source .cli_env/bin/activate 
+    pip3 install -r src/cli/requirements.txt
+    source .cli_env/bin/deactivate
+  else
+    echo "CLI is already installed"
+  fi
 }
 
 install_tui() {
-  $BASEPATH/miniconda3/bin/conda create -y -n bm-tui python=3.7
-  source $BASEPATH/miniconda3/bin/activate bm-tui
-  conda install --file ./src/tui/requirements.txt
+  if [ ! -d ".tui_env" ]
+  then
+    echo "Installing TUI dependencies"
+    python3 -m venv .tui_env
+    source .tui_env/bin/activate 
+    pip3 install -r src/tui/requirements.txt
+    source .tui_env/bin/deactivate
+  else
+    echo "TUI is already installed"
+  fi
 }
-
-install_cli() {
-  $BASEPATH/miniconda3/bin/conda create -y -n bm-cli python=3.7
-  source $BASEPATH/miniconda3/bin/activate bm-cli
-  conda install --file ./src/cli/requirements.txt
-}
-
-[ ! -d "$BASEPATH/miniconda3/" ] && install_miniconda
-
 
 install_docker() {
   curl -fsSL get.docker.com -o get-docker.sh
@@ -62,3 +66,4 @@ select opt in "CLI" "TUI" "ALL" "NONE"; do
   esac
   echo "Not a valid choice [1, 2, 3, 4]"
 done
+
