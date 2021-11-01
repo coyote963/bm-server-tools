@@ -1,7 +1,7 @@
 import fire
 import docker
 
-from cli_utils import (
+from .cli_utils import (
     get_env,
     get_ports,
     get_all_servers,
@@ -10,7 +10,7 @@ from cli_utils import (
     server_is_running,
     delete_server
 )
-from presets import preset_settings
+from .presets import preset_settings
 
 def requires_server(func):
     def wrapper(*args, **kwargs):
@@ -33,7 +33,7 @@ class BoringCLI(object):
         client = docker.from_env()
         try:
             container = client.containers.run(
-                "coyotebm/bm-server-api:dev", 
+                "coyotebm/bm-server-api:latest", 
                 environment=get_env(base_port, num_servers),
                 ports=get_ports(base_port, num_servers),
                 detach=True
@@ -95,7 +95,8 @@ class BoringCLI(object):
             print(f'Not a preset, valid options are {",".join(preset_settings.keys())}')
             
 
-
+def main():
+    fire.Fire(BoringCLI)
 
 if __name__ == '__main__':
-    fire.Fire(BoringCLI)
+    main()

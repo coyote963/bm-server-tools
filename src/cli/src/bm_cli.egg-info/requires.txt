@@ -1,0 +1,12 @@
+certifi
+charset-normalizer
+docker
+fire
+idna
+requests
+six
+tabulate
+termcolor
+toml
+urllib3
+websocket-client

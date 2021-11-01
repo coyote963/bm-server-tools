@@ -1,0 +1,30 @@
+Metadata-Version: 2.1
+Name: bm-cli
+Version: 0.1.2
+Summary: Command line interface for boring man servers
+Home-page: https://github.com/coyote963/bm-server-tools/
+Author: coyote963
+Author-email: coyoteandbird@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/coyote963/bm-server-tools/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+
+### CLI
+
+Command line tools for provisioning servers. A sample of the commands:
+
+1. `start` Starts the Boring Man Wrapper API
+2. `stop` Stops Boring Man Wrapper API and all servers running therein
+3. `add` Adds a server from a preset. Presets are configurable and defined in `presets.py`
+4. `add-custom` Adds a server from a settings file path
+5. `remove` Kills a server and frees its resources
+6. `status` Displays server information in tabular form
+
+

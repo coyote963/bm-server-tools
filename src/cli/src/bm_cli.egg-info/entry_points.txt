@@ -1,0 +1,3 @@
+[console_scripts]
+bmcli = bm_cli.cli:main
+

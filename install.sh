@@ -34,36 +34,23 @@ install_docker() {
   sudo sh get-docker.sh
 }
 
-echo "Do you wish to install docker? [1-2]"
-select yn in "Yes" "No"; do
-  case $yn in
-  Yes)
-    install_docker
-    break
-    ;;
-  No) break ;;
-  esac
-  echo "Not a valid choice [1, 2]"
-done
 
-echo "Which component do you want to install? [1-4]"
-select opt in "CLI" "TUI" "ALL" "NONE"; do
-  case $opt in
-  CLI)
-    install_cli
-    break
-    ;;
-  TUI)
-    install_tui
-    break
-    ;;
-  ALL)
-    install_cli
-    install_tui
-    break
-    ;;
-  NONE) break ;;
-  esac
-  echo "Not a valid choice [1, 2, 3, 4]"
-done
+if [ $1 == "nothing" ]; then
+  echo "Done"
+  exit
+fi
 
+if [ $1 == "cli"]; then
+  install_cli
+  exit
+fi
+
+if [ $1 == "tui"]; then
+  install_tui
+  exit 
+fi
+
+if [ $1 == "docker" ]; then
+  install_docker
+  exit
+fi

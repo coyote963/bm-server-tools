@@ -6,6 +6,8 @@ Provides useful wrapper for bman servers. The core of everything is the boring m
 
 Each tool has its own requirements and are kept separate for the sake of modularity. Only the TUI does not require docker to be installed. The others can be installed by use of the `requirements.txt` file. The most up to date docker image is `coyotebm/bm-server-api:dev`.
 
+[Installation Guide](guide.md)
+
 ### CLI
 
 Command line tools for provisioning servers. A sample of the commands:
