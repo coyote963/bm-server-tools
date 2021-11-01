@@ -5,7 +5,7 @@ CONDA_URL=https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
 install_miniconda() {
   curl -k $CONDA_URL >${BASEPATH}/conda_install.sh
-  bash ${BASEPATH}/conda_install.sh -b -p ${BASEPATH}/Miniconda3
+  bash ${BASEPATH}/conda_install.sh -b -p ${BASEPATH}/miniconda3
   rm -f ${BASEPATH}/conda_install.sh
   $BASEPATH/miniconda3/bin/conda update -y -n base -c defaults conda
 }
@@ -22,9 +22,8 @@ install_cli() {
   conda install --file ./src/cli/requirements.txt
 }
 
-if [[! -d "$BASEPATH/miniconda3" ]]; then
-  install_miniconda
-fi
+[ ! -d "$BASEPATH/miniconda3/" ] && install_miniconda
+
 
 install_docker() {
   curl -fsSL get.docker.com -o get-docker.sh
